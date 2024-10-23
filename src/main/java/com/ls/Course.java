@@ -53,16 +53,10 @@ public class Course {
 
         if (object instanceof Course) {
             Course otherCourse = (Course) object;
-            return (this.isGraduateCourse == otherCourse.isGraduateCourse) && (this.courseNum == otherCourse.courseNum) && (this.courseDept.equalsIgnoreCase(otherCourse.courseDept) && (this.numCredits == otherCourse.numCredits));
-//            if (this.isGraduateCourse == otherCourse.isGraduateCourse) {
-//                if (this.courseNum == otherCourse.courseNum) {
-//                    if (this.courseDept.equalsIgnoreCase(otherCourse.courseDept)) {
-//                        if (this.numCredits == otherCourse.numCredits) {
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
+            return (this.isGraduateCourse == otherCourse.isGraduateCourse)
+                    && (this.courseNum == otherCourse.courseNum)
+                    && (this.courseDept.equalsIgnoreCase(otherCourse.courseDept)
+                    && (this.numCredits == otherCourse.numCredits));
         }
 
         return false;
