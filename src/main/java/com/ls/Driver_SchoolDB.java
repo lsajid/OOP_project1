@@ -1,2 +1,4 @@
-package com.ls;public class Driver_SchoolDB {
+package com.ls;
+
+public class Driver_SchoolDB {
 }
