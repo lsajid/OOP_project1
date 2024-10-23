@@ -42,20 +42,57 @@ public class Course {
         return name;
     }
 
+    public boolean equals(Object object) {
+        if (object == null) {
+            return false;
+        }
+
+        if (this == object) {
+            return true;
+        }
+
+        if (object instanceof Course) {
+            Course otherCourse = (Course) object;
+            return (this.isGraduateCourse == otherCourse.isGraduateCourse) && (this.courseNum == otherCourse.courseNum) && (this.courseDept.equalsIgnoreCase(otherCourse.courseDept) && (this.numCredits == otherCourse.numCredits));
+//            if (this.isGraduateCourse == otherCourse.isGraduateCourse) {
+//                if (this.courseNum == otherCourse.courseNum) {
+//                    if (this.courseDept.equalsIgnoreCase(otherCourse.courseDept)) {
+//                        if (this.numCredits == otherCourse.numCredits) {
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+        }
+
+        return false;
+    }
+
     @Override
     public String toString() {
         String s =
                 String.format(
-                        "Course: %3s-%3d | Number of Credits: %02d | Graduate/Undergraduate",
+                        "Course: %3s-%3d | Number of Credits: %02d |",
                         this.courseDept,
                         this.courseNum,
-                        this.numCredits,
-                        this.isGraduateCourse
+                        this.numCredits
                 );
+
+        if (isGraduateCourse) {
+            s += " Graduate";
+        } else {
+            s += " Undergraduate";
+        }
         return s;
     }
 
-    public int compareTo(Course c) {
-        return -1;
+    public int compareTo(Course otherCourse) {
+        if (otherCourse == null) {return 0;}
+        if (this.courseNum < otherCourse.courseNum) {
+            return -1;
+        } else if (this.courseNum > otherCourse.courseNum) {
+            return 1;
+        }
+        return 0;
     }
 }
