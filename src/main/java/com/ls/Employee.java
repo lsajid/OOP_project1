@@ -2,15 +2,17 @@ package com.ls;
 
 public class Employee extends Person {
     private String deptName;
-    private static int numEmployees=0;
+    private static int numEmployees = 0;
     private int employeeID;
 
     public Employee() {
+        super();
         this.deptName = "";
         this.employeeID = ++numEmployees;
     }
 
     public Employee(String deptName) {
+        super();
         this.deptName = deptName;
         this.employeeID = ++numEmployees;
     }
@@ -57,6 +59,12 @@ public class Employee extends Person {
     public String toString() {
         return super.toString() +
                 " Employee: Department:           " + deptName + " | Employee Number:   " + employeeID;
+    }
+
+
+    public String toString(boolean isChild) {
+        return super.toString() +
+                " Employee: Department:           " + deptName + " | Employee Number:  " + employeeID;
     }
 
 

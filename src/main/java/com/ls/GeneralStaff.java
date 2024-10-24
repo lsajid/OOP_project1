@@ -4,10 +4,12 @@ public class GeneralStaff extends Employee {
     private String duty;
 
     public GeneralStaff() {
+        super();
         this.duty = "";
     }
 
     public GeneralStaff(String duty) {
+        super();
         this.duty = duty;
     }
 

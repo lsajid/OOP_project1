@@ -81,7 +81,9 @@ public class Course {
     }
 
     public int compareTo(Course otherCourse) {
-        if (otherCourse == null) {return 0;}
+        if (otherCourse == null) {
+            return 0;
+        }
         if (this.courseNum < otherCourse.courseNum) {
             return -1;
         } else if (this.courseNum > otherCourse.courseNum) {
