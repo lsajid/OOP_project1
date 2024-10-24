@@ -7,12 +7,14 @@ public class Faculty extends Employee {
 
     public Faculty() {
         // coursesTaught = [], numCoursesTaught = 0, isTenured = false
+        super();
         this.coursesTaught = new Course[100];
         this.numCoursesTaught = 0;
         this.isTenured = false;
     }
 
     public Faculty(boolean isTenured) {
+        super();
         this.coursesTaught = new Course[100];
         this.numCoursesTaught = 0;
         this.isTenured = isTenured;
@@ -30,6 +32,7 @@ public class Faculty extends Employee {
         this.setName(name);
         this.setBirthYear(birthYear);
         this.setDeptName(deptName);
+        this.coursesTaught = new Course[100];
         this.isTenured = isTenured;
     }
 
@@ -46,13 +49,14 @@ public class Faculty extends Employee {
     }
 
     public void addCourseTaught(Course course) {
-        for (int i=0; i < coursesTaught.length; i++) {
-            if (coursesTaught[i] == null) {
-                coursesTaught[i] = course;
-                break;
-            }
+
+        if(numCoursesTaught < 100) {
+            coursesTaught[numCoursesTaught] = course;
+            numCoursesTaught++;
         }
     }
+
+
 
     public void addCoursesTaught(Course[] courses) {
         for (int i=0; i < courses.length; i++) {
@@ -71,7 +75,6 @@ public class Faculty extends Employee {
 
     public String getCourseTaughtAsString(int index) {
         Course course = getCourseTaught(index);
-
         return course.toString();
     }
 
@@ -120,23 +123,14 @@ public class Faculty extends Employee {
         if(p == null) {
             return 0;
         }
-        int num = super.compareTo(p);
         if (p instanceof Faculty) {
             Faculty otherFaculty = (Faculty) p;
-            if (num == 1 && this.numCoursesTaught > otherFaculty.numCoursesTaught) {
+            if (this.numCoursesTaught > otherFaculty.numCoursesTaught) {
                 return 1;
             }
-            if (num == -1 && this.numCoursesTaught < otherFaculty.numCoursesTaught) {
+            if (this.numCoursesTaught < otherFaculty.numCoursesTaught) {
                 return -1;
             }
-            if (num == 0) {
-                if (this.numCoursesTaught > otherFaculty.numCoursesTaught) {
-                    return 1;
-                } else if (this.numCoursesTaught < otherFaculty.numCoursesTaught) {
-                    return -1;
-                }
-            }
-            return  num;
         }
         return 0;
     }

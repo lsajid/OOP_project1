@@ -1,4 +1,4 @@
-//package com.ls;
+package com.ls;
 
 import java.util.Objects;
 
@@ -11,6 +11,7 @@ public class Student extends Person {
     private String major = "undeclared";
 
     public Student() {
+        super();
         this.coursesTaken = new Course[50];
         this.numCoursesTaken = 0;
         this.isGraduate = false;
@@ -18,11 +19,15 @@ public class Student extends Person {
     }
 
     public Student(boolean isGraduate) {
+        super();
+        this.coursesTaken = new Course[50];
         this.isGraduate = isGraduate;
         this.studentID = ++numStudents;
     }
 
     public Student(String major, boolean isGraduate) {
+        super();
+        this.coursesTaken = new Course[50];
         this.major = major;
         this.isGraduate = isGraduate;
         this.studentID = ++numStudents;
@@ -30,6 +35,7 @@ public class Student extends Person {
 
     public Student(String name, int birthYear, String major, boolean isGraduate) {
         super(name, birthYear);
+        this.coursesTaken = new Course[50];
         this.major = major;
         this.isGraduate = isGraduate;
         this.studentID = ++numStudents;
@@ -70,13 +76,10 @@ public class Student extends Person {
     }
 
     public void addCourseTaken(Course course) {
-        for (int i=0; i < coursesTaken.length; i++) {
-            if (coursesTaken[i] == null) {
-                coursesTaken[i] = course;
-                break;
-            }
+        if(numCoursesTaken < 50) {
+            coursesTaken[numCoursesTaken] = course;
+            numCoursesTaken++;
         }
-        numCoursesTaken++;
     }
 
     public void addCoursesTaken(Course[] courses) {
@@ -137,4 +140,29 @@ public class Student extends Person {
         return super.toString() + studentIDFormat +" | Major           " + major + " |       " + graduate + " | Number of Courses Taken:   " + numCoursesTaken + " | Courses Taken: " + getAllCoursesTakenAsString();
     }
 
+    @Override
+    public int compareTo(Person p) {
+        if(p == null) {
+            return 0;
+        }
+        if (p instanceof Student) {
+            Student otherStudent = (Student) p;
+            if (this.getTotalNumberOfCredits() > otherStudent.getTotalNumberOfCredits()) {
+                return 1;
+            }
+            if (this.getTotalNumberOfCredits() < otherStudent.getTotalNumberOfCredits()) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    public int getTotalNumberOfCredits() {
+        int totalNumberOfCredits = 0;
+        for(int i=0; i < coursesTaken.length; i++) {
+            if(coursesTaken[i] == null) break;
+            totalNumberOfCredits += coursesTaken[i].getNumCredits();
+        }
+        return totalNumberOfCredits;
+    }
 }
