@@ -5,6 +5,8 @@ import java.io.File;
 
 public class Driver_SchoolDB {
     public static void main(String[] args) {
+        //PART 1 ************************************************************************************************
+
         //init hashMap to store lineContent and index
         HashMap<Integer, String> contentMap = new HashMap<>();
 
@@ -34,6 +36,16 @@ public class Driver_SchoolDB {
         generateStudentText(students);
 
         generateMenuOrFooter("footer");
+
+        //PART 2 ************************************************************************************************
+
+        //init null scanner variable for userInput stream
+        Scanner scnr = new Scanner(System.in);
+        //create new instance of userMenu
+        UserMenu userMenu = new UserMenu(scnr);
+
+        userMenu.closeUserScanner(scnr);
+
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
