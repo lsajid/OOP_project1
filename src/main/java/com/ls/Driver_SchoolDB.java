@@ -1,8 +1,6 @@
 package com.ls;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Scanner;
 import java.io.File;
 
@@ -32,6 +30,8 @@ public class Driver_SchoolDB {
         generateCourseText(courses);
         //generate person text
         generatePersonText(people);
+        //generate employee text
+        generateEmployeeText(employees);
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
@@ -140,6 +140,16 @@ public class Driver_SchoolDB {
         for (Person person : people) {
             if(person == null) break;
             System.out.println(person.toString());
+        }
+        System.out.println("************************************************\n" +
+                "************************************************");
+    }
+
+    public static void generateEmployeeText(Employee[] employees) {
+        System.out.println("EMPLOYEES:");
+        for (Employee employee : employees) {
+            if(employee == null) break;
+            System.out.println(employee.toString());
         }
         System.out.println("************************************************\n" +
                 "************************************************");
