@@ -1,6 +1,8 @@
 package com.ls;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.io.File;
 
@@ -9,6 +11,14 @@ public class Driver_SchoolDB {
         //init hashMap to store lineContent and index
         HashMap<Integer, String> contentMap = new HashMap<>();
 
+        //init arrays to store objects
+        Course[] courses = new Course[15];
+        Faculty[] faculties = new Faculty[15];
+        GeneralStaff[] generalStaffs = new GeneralStaff[15];
+        Employee[] employees = new Employee[15];
+        Person[] people = new Person[15];
+        Student[] students = new Student[15];
+
         //read file and store content in hashMap
         printAndStoreFileContent(true, contentMap);
 
@@ -16,7 +26,12 @@ public class Driver_SchoolDB {
         generateMenu();
 
         //generate classes as specified in file
-        generateFormattedContent(contentMap);
+        generateClassesFromMap(contentMap, courses);
+
+        //generate course text
+        generateCourseText(courses);
+        //generate person text
+        generatePersonText(people);
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
@@ -52,30 +67,82 @@ public class Driver_SchoolDB {
         System.out.println("************************************************");
     }
 
-    public static void generateFormattedContent(HashMap<Integer, String> contentMap) {
-        //
-    }
-
-    public String getClassType (String str) {
-        return "";
-    }
-
-    public String[] getConstructorParams(String str) {
-        String[] strArr = new String[1];
-        return strArr;
-    }
-
-    public static void createClass(String classType, String constructorParams) {
-        switch (classType) {
-            case "Course":
-                System.out.println("Create course");
-                break;
-            case "General Staff":
-                System.out.println("");
-                break;
-            case "":
-
-                break;
+    public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses) {
+        //iterate through contentMap to get class type
+        for (String line : contentMap.values()) {
+            String classType = getClassType(line);
+            String[] constructorParams = getConstructorParams(line);
+            if (classType != null && !classType.isEmpty()) {
+                createAndStoreClass(classType, constructorParams, courses);
+            }
         }
     }
+
+    public static String getClassType (String str) {
+        if (str.isEmpty()) {return null;}
+        return str.substring(0, str.indexOf(":"));
+    }
+
+    public static String[] getConstructorParams(String str) {
+        if(str.isEmpty()) return null;
+        return str.substring(str.indexOf(":")+1).trim().split(",");
+    }
+
+    public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses) {
+        switch (classType) {
+            case "Course":
+                boolean isGraduateCourse = Boolean.parseBoolean(constructorParams[0]);
+                int courseNum = Integer.parseInt(constructorParams[1].trim());
+                String courseDept = constructorParams[2].trim();
+                int numCredits = Integer.parseInt(constructorParams[3].trim());
+
+                Course courseToAdd = new Course(isGraduateCourse, courseNum, courseDept, numCredits);
+                appendCourseToArray(courses, courseToAdd);
+                break;
+            case "General Staff":
+                //check length of constructor params
+                System.out.println("Create General Staff");
+                break;
+            case "Faculty":
+                System.out.println("Faculty");
+                break;
+            case "Student":
+                System.out.println("student");
+            case "Employee":
+                System.out.println("Employee");
+            case "Person":
+                System.out.println("Person");
+        }
+    }
+
+    public static void appendCourseToArray(Course[] courses, Course course) {
+        //TODO: Add check length of array
+        for(int i = 0; i < courses.length; i++) {
+            if(courses[i] == null) {
+                courses[i] = course;
+                break;
+            }
+        }
+    }
+
+    public static void generateCourseText(Course[] courses) {
+        System.out.println("COURSES:");
+        for (Course course : courses) {
+            if(course == null) break;
+            System.out.println(course.toString());
+        }
+        System.out.println("************************************************\n" +
+                "************************************************");
+    }
+
+    public static void generatePersonText(Person[] people) {
+        System.out.println("PERSONS:");
+        for (Person person : people) {
+            if(person == null) break;
+            System.out.println(person.toString());
+        }
+        System.out.println("************************************************\n" +
+                "************************************************");
+    }
+
 }
