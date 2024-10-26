@@ -20,10 +20,10 @@ public class Driver_SchoolDB {
         printAndStoreFileContent(true, contentMap);
 
         //print first part of stars
-        generateMenu();
+        generateMenuOrFooter("menu");
 
         //generate classes as specified in file
-        generateClassesFromMap(contentMap, courses, generalStaffs, faculties);
+        generateClassesFromMap(contentMap, courses, generalStaffs, faculties, students);
 
         //functions to generate text from stored arrays
         generateCourseText(courses);
@@ -31,6 +31,9 @@ public class Driver_SchoolDB {
         generateEmployeeText(employees);
         generateGeneralStaffText(generalStaffs);
         generateFacultyText(faculties);
+        generateStudentText(students);
+
+        generateMenuOrFooter("footer");
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
@@ -59,14 +62,19 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateMenu() {
-        System.out.println("**************************************************************");
-        System.out.println("SCHOOL DATABASE INFO:");
-        System.out.println();
-        System.out.println("************************************************");
+    public static void generateMenuOrFooter(String option) {
+        if(option.equals("menu")){
+            System.out.println("**************************************************************");
+            System.out.println("SCHOOL DATABASE INFO:");
+            System.out.println();
+            System.out.println("************************************************");
+        } else if(option.equals("footer")) {
+            System.out.println("************************************************\n" +
+                    "**************************************************************");
+        }
     }
 
-    public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties) {
+    public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
         System.out.println("LOOK");
         //iterate through contentMap to get class type
         for (String line : contentMap.values()) {
@@ -75,7 +83,7 @@ public class Driver_SchoolDB {
             String[] constructorParams = getConstructorParams(line);
             System.out.println("what is constructor params "+ Arrays.toString(constructorParams));
             if (classType != null && !classType.isEmpty()) {
-                createAndStoreClass(classType, constructorParams, courses, generalStaffs, faculties);
+                createAndStoreClass(classType, constructorParams, courses, generalStaffs, faculties, students);
             }
         }
         System.out.println("look");
@@ -91,7 +99,7 @@ public class Driver_SchoolDB {
         return str.substring(str.indexOf(":")+1).trim().split(",");
     }
 
-    public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties) {
+    public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
         switch (classType) {
             case "Course":
                 boolean isGraduateCourse = Boolean.parseBoolean(constructorParams[0]);
@@ -155,11 +163,34 @@ public class Driver_SchoolDB {
                 appendFacultyToArray(faculties, facultyToAdd);
                 break;
             case "Student":
-                System.out.println("student");
+                Student studentToAdd = null;
+                if(constructorParams.length == 1) {
+                    if(Objects.equals(constructorParams[0], "")){
+                        studentToAdd = new Student();
+                    }else {
+                        boolean isGraduate = Boolean.parseBoolean(constructorParams[0]);
+                        studentToAdd = new Student(isGraduate);
+                    }
+                }
+                if(constructorParams.length == 2) {
+                    String major = constructorParams[0];
+                    boolean isGraduate = Boolean.parseBoolean(constructorParams[1]);
+                    studentToAdd = new Student(major, isGraduate);
+                }
+                if(constructorParams.length == 4) {
+                    String name = constructorParams[0];
+                    int birthYear = Integer.parseInt(constructorParams[1].trim());
+                    String major = constructorParams[2];
+                    boolean isGraduate = Boolean.parseBoolean(constructorParams[3]);
+
+                    studentToAdd = new Student(name, birthYear, major, isGraduate);
+                }
+                appendStudentToArray(students ,studentToAdd);
+                break;
             case "Employee":
-                System.out.println("Employee");
+                break;
             case "Person":
-                System.out.println("Person");
+                break;
         }
     }
 
@@ -243,4 +274,21 @@ public class Driver_SchoolDB {
                 "************************************************");
     }
 
+    public static void appendStudentToArray(Student[] students, Student student) {
+        //TODO: Add check length of array
+        for(int i = 0; i < students.length; i++) {
+            if(students[i] == null) {
+                students[i] = student;
+                break;
+            }
+        }
+    }
+
+    public static void generateStudentText(Student[] students) {
+        System.out.println("STUDENTS:");
+        for(Student student : students) {
+            if(student == null) break;
+            System.out.println(student.toString());
+        }
+    }
 }
