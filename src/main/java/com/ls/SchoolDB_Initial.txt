@@ -14,7 +14,7 @@ GeneralStaff: advise students
 GeneralStaff: Sanitation,clean
 GeneralStaff: Flash Gordon,1934,Security,safety
 
-Course: true,777,CMP,4
+Course: true,666,PSY,8
 Course: true,711,CMP,4
 Course: true,723,MAT,4
 Course: false,168,CMP,4
