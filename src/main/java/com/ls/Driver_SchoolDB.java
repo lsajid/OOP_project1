@@ -17,7 +17,7 @@ public class Driver_SchoolDB {
         Student[] students = new Student[15];
 
         //read file and store content in hashMap
-        printAndStoreFileContent(true, contentMap);
+        printAndStoreFileContent(false, contentMap);
 
         //print first part of stars
         generateMenuOrFooter("menu");
@@ -241,12 +241,11 @@ public class Driver_SchoolDB {
     }
 
     public static void generateGeneralStaffText(GeneralStaff[] generalStaffs) {
-        //    Person: Name:                                | Birth Year:    0 Employee: Department:                      | Employee Number:   5 GeneralStaff: Duty:
         System.out.println("GENERAL STAFF:");
         for (GeneralStaff generalStaff : generalStaffs) {
             if(generalStaff == null) break;
             System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %30s | Employee Number: %4d GeneralStaff: Duty: %20s",
+                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d GeneralStaff: Duty: %10s",
                     generalStaff.getName(),
                     generalStaff.getBirthYear(),
                     generalStaff.getDeptName(),
@@ -273,7 +272,7 @@ public class Driver_SchoolDB {
         for(Faculty faculty : faculties) {
             if(faculty == null) break;
             System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %4d Faculty: %12s | Number of Courses Taught: %4d | Courses Taught: %20s",
+                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d Faculty: %11s | Number of Courses Taught: %3d | Courses Taught: %s",
                     faculty.getName(),
                     faculty.getBirthYear(),
                     faculty.getDeptName(),
@@ -302,10 +301,10 @@ public class Driver_SchoolDB {
         for(Student student : students) {
             if(student == null) break;
             System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %15s | %14s | Number of Courses Taken: %4d | Courses Taken: %20s",
+                    "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %20s | %14s | Number of Courses Taken: %3d | Courses Taken: %s",
                     student.getName(),
                     student.getBirthYear(),
-                    student.getStudentID(),
+                    "000" + student.getStudentID(),
                     student.getMajor(),
                     student.isGraduate() ? "Graduate" : "Undergraduate",
                     student.getNumCoursesTaken(),
