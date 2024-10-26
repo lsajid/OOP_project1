@@ -1,6 +1,8 @@
 package com.ls;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Scanner;
 import java.io.File;
 
@@ -24,14 +26,14 @@ public class Driver_SchoolDB {
         generateMenu();
 
         //generate classes as specified in file
-        generateClassesFromMap(contentMap, courses);
+        generateClassesFromMap(contentMap, courses, generalStaffs);
 
-        //generate course text
+        //functions to generate text from stored arrays
         generateCourseText(courses);
-        //generate person text
         generatePersonText(people);
-        //generate employee text
         generateEmployeeText(employees);
+        generateGeneralStaffText(generalStaffs);
+        System.out.println("IS general staff empty working" + Arrays.toString(generalStaffs));
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
@@ -67,15 +69,19 @@ public class Driver_SchoolDB {
         System.out.println("************************************************");
     }
 
-    public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses) {
+    public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses, GeneralStaff[] generalStaffs) {
+        System.out.println("LOOK");
         //iterate through contentMap to get class type
         for (String line : contentMap.values()) {
+            System.out.println("LINE"+ line);
             String classType = getClassType(line);
             String[] constructorParams = getConstructorParams(line);
+            System.out.println("what is constructor params "+ Arrays.toString(constructorParams));
             if (classType != null && !classType.isEmpty()) {
-                createAndStoreClass(classType, constructorParams, courses);
+                createAndStoreClass(classType, constructorParams, courses, generalStaffs);
             }
         }
+        System.out.println("look");
     }
 
     public static String getClassType (String str) {
@@ -88,7 +94,7 @@ public class Driver_SchoolDB {
         return str.substring(str.indexOf(":")+1).trim().split(",");
     }
 
-    public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses) {
+    public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses, GeneralStaff[] generalStaffs) {
         switch (classType) {
             case "Course":
                 boolean isGraduateCourse = Boolean.parseBoolean(constructorParams[0]);
@@ -99,9 +105,31 @@ public class Driver_SchoolDB {
                 Course courseToAdd = new Course(isGraduateCourse, courseNum, courseDept, numCredits);
                 appendCourseToArray(courses, courseToAdd);
                 break;
-            case "General Staff":
-                //check length of constructor params
-                System.out.println("Create General Staff");
+            case "GeneralStaff":
+                GeneralStaff generalStaffToAdd = null;
+                if(constructorParams.length == 1) {
+                    if(Objects.equals(constructorParams[0], "")){
+                        generalStaffToAdd = new GeneralStaff();
+                    }else {
+                        generalStaffToAdd = new GeneralStaff(constructorParams[0]);
+                    }
+                }
+
+                if(constructorParams.length == 2) {
+                    String deptName = constructorParams[0];
+                    String duty = constructorParams[1];
+                    generalStaffToAdd = new GeneralStaff(deptName, duty);
+                }
+
+                if(constructorParams.length == 4) {
+                    String name = constructorParams[0];
+                    int birthYear = Integer.parseInt(constructorParams[1].trim());
+                    String deptName = constructorParams[2];
+                    String duty = constructorParams[3];
+                    generalStaffToAdd = new GeneralStaff(name, birthYear, deptName, duty);
+                }
+
+                appendGeneralStaffToArray(generalStaffs, generalStaffToAdd);
                 break;
             case "Faculty":
                 System.out.println("Faculty");
@@ -150,6 +178,26 @@ public class Driver_SchoolDB {
         for (Employee employee : employees) {
             if(employee == null) break;
             System.out.println(employee.toString());
+        }
+        System.out.println("************************************************\n" +
+                "************************************************");
+    }
+
+    public static void appendGeneralStaffToArray(GeneralStaff[] generalStaffs, GeneralStaff generalStaff) {
+        //TODO: Add check length of array
+        for(int i = 0; i < generalStaffs.length; i++) {
+            if(generalStaffs[i] == null) {
+                generalStaffs[i] = generalStaff;
+                break;
+            }
+        }
+    }
+
+    public static void generateGeneralStaffText(GeneralStaff[] generalStaffs) {
+        System.out.println("GENERAL STAFF:");
+        for (GeneralStaff generalStaff : generalStaffs) {
+            if(generalStaff == null) break;
+            System.out.println(generalStaff.toString());
         }
         System.out.println("************************************************\n" +
                 "************************************************");
