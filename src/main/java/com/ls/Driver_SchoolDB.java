@@ -70,23 +70,19 @@ public class Driver_SchoolDB {
             System.out.println("************************************************");
         } else if(option.equals("footer")) {
             System.out.println("************************************************\n" +
-                    "**************************************************************");
+                    "**************************************************************\n");
         }
     }
 
     public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
-        System.out.println("LOOK");
         //iterate through contentMap to get class type
         for (String line : contentMap.values()) {
-            System.out.println("LINE"+ line);
             String classType = getClassType(line);
             String[] constructorParams = getConstructorParams(line);
-            System.out.println("what is constructor params "+ Arrays.toString(constructorParams));
             if (classType != null && !classType.isEmpty()) {
                 createAndStoreClass(classType, constructorParams, courses, generalStaffs, faculties, students);
             }
         }
-        System.out.println("look");
     }
 
     public static String getClassType (String str) {
@@ -245,10 +241,18 @@ public class Driver_SchoolDB {
     }
 
     public static void generateGeneralStaffText(GeneralStaff[] generalStaffs) {
+        //    Person: Name:                                | Birth Year:    0 Employee: Department:                      | Employee Number:   5 GeneralStaff: Duty:
         System.out.println("GENERAL STAFF:");
         for (GeneralStaff generalStaff : generalStaffs) {
             if(generalStaff == null) break;
-            System.out.println(generalStaff.toString());
+            System.out.println(String.format(
+                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %30s | Employee Number: %4d GeneralStaff: Duty: %20s",
+                    generalStaff.getName(),
+                    generalStaff.getBirthYear(),
+                    generalStaff.getDeptName(),
+                    generalStaff.getEmployeeID(),
+                    generalStaff.getDuty()
+            ));
         }
         System.out.println("************************************************\n" +
                 "************************************************");
@@ -268,7 +272,16 @@ public class Driver_SchoolDB {
         System.out.println("FACULTY:");
         for(Faculty faculty : faculties) {
             if(faculty == null) break;
-            System.out.println(faculty.toString());
+            System.out.println(String.format(
+                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %4d Faculty: %12s | Number of Courses Taught: %4d | Courses Taught: %20s",
+                    faculty.getName(),
+                    faculty.getBirthYear(),
+                    faculty.getDeptName(),
+                    faculty.getEmployeeID(),
+                    faculty.isTenured() ? "Is Tenured" : "Not Tenured",
+                    faculty.getNumCoursesTaught(),
+                    faculty.getAllCoursesTaughtAsString()
+            ));
         }
         System.out.println("************************************************\n" +
                 "************************************************");
@@ -288,7 +301,16 @@ public class Driver_SchoolDB {
         System.out.println("STUDENTS:");
         for(Student student : students) {
             if(student == null) break;
-            System.out.println(student.toString());
+            System.out.println(String.format(
+                    "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %15s | %14s | Number of Courses Taken: %4d | Courses Taken: %20s",
+                    student.getName(),
+                    student.getBirthYear(),
+                    student.getStudentID(),
+                    student.getMajor(),
+                    student.isGraduate() ? "Graduate" : "Undergraduate",
+                    student.getNumCoursesTaken(),
+                    student.getAllCoursesTakenAsString()
+            ));
         }
     }
 }
