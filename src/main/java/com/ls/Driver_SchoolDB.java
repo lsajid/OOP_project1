@@ -1,5 +1,8 @@
 package com.ls;
 
+import javax.sound.midi.Soundbank;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.io.File;
 
@@ -18,6 +21,9 @@ public class Driver_SchoolDB {
         Person[] people = new Person[15];
         Student[] students = new Student[15];
 
+        //init String for content
+        String content = "";
+
         //read file and store content in hashMap
         printAndStoreFileContent(true, contentMap);
 
@@ -28,9 +34,9 @@ public class Driver_SchoolDB {
         generateClassesFromMap(contentMap, courses, generalStaffs, faculties, students);
 
         //functions to generate text from stored arrays
-        generateCourseText(courses, true);
-        generatePersonText(people);
-        generateEmployeeText(employees);
+        content += generateCourseText(courses, true);
+        content += generatePersonText(people);
+        conent += generateEmployeeText(employees);
         generateGeneralStaffText(generalStaffs, true);
         generateFacultyText(faculties, true);
         generateStudentText(students, true);
@@ -48,15 +54,6 @@ public class Driver_SchoolDB {
 
         //generate all items for class
         generateAndPrintAllItemsFromUserInputArray(userInputItems, courses, generalStaffs, faculties, students);
-
-        //show All courses
-        generateCourseText(courses, false);
-        generateGeneralStaffText(generalStaffs, false);
-        generateFacultyText(faculties, false);
-        generateStudentText(students, false);
-
-        //close scanner instance
-        userMenu.closeUserScanner();
 
         //Add 2 new Courses to a Faculty object
         System.out.println("(2 pts) Add 2 new Courses to a Faculty object");
@@ -76,7 +73,12 @@ public class Driver_SchoolDB {
         System.out.println("(1 pts) Add an array of 2 Courses to a Faculty object");
         appendFacultyToArray(faculties, new Faculty("Prof. Sofianos", 2024, "CMP", true));
         Faculty professor = getFacultyByName("Prof. Sofianos", faculties);
-        Course[] coursesToAdd = new Course[] {new Course(true, 252, "CMP", 4), new Course(true, 168, "CMP", 4)};
+        Course[] coursesToAdd = new Course[] {
+                new Course(true, 252, "CMP", 4),
+                new Course(true, 168, "CMP", 4),
+                new Course(false, 167, "CMP", 4),
+                new Course(true, 382, "CHE", 4)
+        };
         professor.addCoursesTaught(coursesToAdd);
         System.out.println("Faculty object: " + professor.toString()+ "\n\n");
 
@@ -100,11 +102,202 @@ public class Driver_SchoolDB {
         System.out.println("Valid Course: " + validCourseFromLaiba + "\nInvalid Index: " + invalidCourseFromLaiba + "\n\n");
 
 
+        String input = "";
+        Faculty facultyToCheck = null;
+        Course courseToCheck = null;
+        Scanner scnr = new Scanner(System.in);
+        System.out.println("Please view Faculty and course from our menu");
+        generateFacultyText(faculties, true);
+        System.out.println("Arrays.toString(faculties)" + Arrays.toString(faculties));
+        generateCourseText(courses, true);
+        while(!input.equals("q")) {
+            System.out.println("Enter faculty Employee Number of interest (Enter q to quit)");
+            input = scnr.nextLine();
+            if(!input.equals("q")) {
+                facultyToCheck = getFacultyByEmployeeNumber(input, faculties);
+                System.out.println("Enter Course Course Number of interest");
+                String courseNumber = scnr.nextLine();
+                courseToCheck = getCourseByCourseNumber(courseNumber, courses);
+
+                if(facultyToCheck.doesFacultyTeachSelectedCourse(courseToCheck)){
+                    System.out.println("Faculty: " + facultyToCheck.getName() + "has taught course " + courseToCheck.toString() + " Please use start over");
+                } else{
+                    System.out.println("Faculty: " + facultyToCheck.getName() + "has not taught course " + courseToCheck.toString() + " Please use start over");
+                }
+            }
+        }
+        System.out.println("Closing scanner...");
+        if(scnr != null) {
+            scnr.close();
+        }
+
+        System.out.println("\n\n(1 pts)Determine which Faculty object teaches the most and the least courses.");
+        Faculty maxFaculty = getMaxFaculty(faculties);
+        Faculty minFaculty = getMinFaculty(faculties);
+        System.out.println("Faculty who taught the most courses: "+ maxFaculty);
+        System.out.println("Faculty who taught the least courses: "+ minFaculty);
+
+        System.out.println("\n\n(1 pts) Determine which Course is the minimum of all Course objects in the catalog.");
+        Course minCourseFromCatalogue = getMinCourseFromCatalogue(courses);
+        System.out.println("Course with minimum number: " + minCourseFromCatalogue);
+
+        System.out.println("\n\n(1 pts) Determine which Course is the maximum of all Course objects in the catalog");
+        Course maxCourseFromCatalogue = getMaxCourseFromCatalogue(courses);
+        System.out.println("Course with maximum number: " + maxCourseFromCatalogue);
+
+        System.out.println("\n\n(1 pts) Determine which Student has the most and least credits.");
+        Student studentWithMaxCredits = getStudentWithMaxCredits(students);
+        Student studentWithMinCredits = getStudentWithMinCredits(students);
+        System.out.println("Student with the most credits: "+ studentWithMaxCredits);
+        System.out.println("Student with the least credits: "+ studentWithMinCredits);
+
+        //print all items using.toString()
+        generateCourseText(courses, false);
+        generateGeneralStaffText(generalStaffs, false);
+        generateFacultyText(faculties, false);
+        generateStudentText(students, false);
+
     }
 
-    public static Boolean doesFacultyTeachCourse() {
+    public void writeToNewFile(String fileName, String content){
+        PrintWriter outStream = null;//DECLARE
+        try {
+            outStream = new PrintWriter(fileName);//INITIALIZE... CREATE...
+            outStream.println(content);//write to the file
+            outStream.flush();
+        } catch (FileNotFoundException e) {
+            //CATCH EXCEPTION
+            System.out.println("PROBLEM WRITE TO NEW FILE "+fileName);
+            e.printStackTrace();
+        }finally{
+            if(outStream != null){
+                outStream.close();
+            }
+            System.out.println("Done TRYING TO WRITE TO NEW FILE: "+fileName);
+        }
+    }
 
-        return false;
+    public static Student getStudentWithMaxCredits(Student[] students) {
+        int max = students[0].getTotalNumberOfCredits();
+
+        for (Student student : students) {
+            if(student == null) break;
+            max = Math.max(max, student.getTotalNumberOfCredits());
+        }
+
+        for(Student student : students) {
+            if(student == null) break;
+            if(student.getTotalNumberOfCredits() == max) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public static Student getStudentWithMinCredits(Student[] students) {
+        int min = students[0].getTotalNumberOfCredits();
+
+        for (Student student : students) {
+            if(student == null) break;
+            min = Math.min(min, student.getTotalNumberOfCredits());
+        }
+
+        for(Student student : students) {
+            if(student == null) break;
+            if(student.getTotalNumberOfCredits() == min) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public static Course getMaxCourseFromCatalogue(Course[] courses) {
+        int max = courses[0].getCourseNum();
+
+        for (Course course : courses) {
+            if(course == null) break;
+            max = Math.max(max, course.getCourseNum());
+        }
+
+        for(Course course : courses) {
+            if(course == null) break;
+            if(course.getCourseNum() == max) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+    public static Course getMinCourseFromCatalogue(Course[] courses) {
+        int min = courses[0].getCourseNum();
+
+        for (Course course : courses) {
+            if(course == null) break;
+            min = Math.min(min, course.getCourseNum());
+        }
+
+        for(Course course : courses) {
+            if(course == null) break;
+            if(course.getCourseNum() == min) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+    public static Faculty getMaxFaculty(Faculty[] faculties) {
+        int max = 0;
+
+        for (Faculty faculty : faculties) {
+            if(faculty == null) break;
+            max = Math.max(max, faculty.getNumCoursesTaught());
+        }
+
+        for(Faculty faculty : faculties) {
+            if(faculty == null) break;
+            if(faculty.getNumCoursesTaught() == max) {
+                return faculty;
+            }
+        }
+        return null;
+    }
+
+    public static Faculty getMinFaculty(Faculty[] faculties) {
+        int min = 0;
+
+        for (Faculty faculty : faculties) {
+            if(faculty == null) break;
+            min = Math.min(min, faculty.getNumCoursesTaught());
+        }
+
+        for(Faculty faculty : faculties) {
+            if(faculty == null) break;
+            if(faculty.getNumCoursesTaught() == min) {
+                return faculty;
+            }
+        }
+        return null;
+    }
+
+    public static Course getCourseByCourseNumber(String courseNumber, Course[] courses) {
+        int item = Integer.parseInt(courseNumber);
+        for(Course course : courses) {
+            if(course.getCourseNum() == item) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+
+    public static Faculty getFacultyByEmployeeNumber(String employeeNum, Faculty[] faculties) {
+        int item = Integer.parseInt(employeeNum);
+        for(Faculty faculty : faculties) {
+            if(faculty.getEmployeeID() == item) {
+                return faculty;
+            }
+        }
+        return null;
     }
 
     public static Faculty getFacultyByName(String name, Faculty[] faculties) {
@@ -311,36 +504,51 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateCourseText(Course[] courses, boolean isPart1) {
+    public static String generateCourseText(Course[] courses, boolean isPart1) {
+        String s = "COURSES:";
         System.out.println("COURSES:");
         for (Course course : courses) {
             if(course == null) break;
+            s += course.toString();
             System.out.println(course.toString());
         }
         if(isPart1) {
+            s += "************************************************\n" +
+                    "************************************************";
             System.out.println("************************************************\n" +
                     "************************************************");
         }
+        return s;
     }
 
-    public static void generatePersonText(Person[] people) {
+    public static String generatePersonText(Person[] people) {
+        String s = "PERSONS:";
         System.out.println("PERSONS:");
         for (Person person : people) {
             if(person == null) break;
+            s += person.toString();
             System.out.println(person.toString());
         }
+        s += "************************************************\n" +
+                "************************************************";
         System.out.println("************************************************\n" +
                 "************************************************");
+        return s;
     }
 
-    public static void generateEmployeeText(Employee[] employees) {
+    public static String generateEmployeeText(Employee[] employees) {
+        String s = "EMPLOYEES:";
         System.out.println("EMPLOYEES:");
         for (Employee employee : employees) {
             if(employee == null) break;
+            s += employee.toString();
             System.out.println(employee.toString());
         }
+        s += "************************************************\n" +
+                "************************************************";
         System.out.println("************************************************\n" +
                 "************************************************");
+        return s;
     }
 
     public static void appendGeneralStaffToArray(GeneralStaff[] generalStaffs, GeneralStaff generalStaff) {
@@ -353,11 +561,20 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateGeneralStaffText(GeneralStaff[] generalStaffs, boolean isPart1) {
+    public static String generateGeneralStaffText(GeneralStaff[] generalStaffs, boolean isPart1) {
+        String s = "GENERAL STAFF:";
         System.out.println("GENERAL STAFF:");
         for (GeneralStaff generalStaff : generalStaffs) {
             if(generalStaff == null) break;
             if(isPart1) {
+                s += String.format(
+                        "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d GeneralStaff: Duty: %10s",
+                        generalStaff.getName(),
+                        generalStaff.getBirthYear(),
+                        generalStaff.getDeptName(),
+                        generalStaff.getEmployeeID(),
+                        generalStaff.getDuty()
+                );
                 System.out.println(String.format(
                         "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d GeneralStaff: Duty: %10s",
                         generalStaff.getName(),
@@ -371,9 +588,12 @@ public class Driver_SchoolDB {
             }
         }
         if(isPart1) {
+            s += "************************************************\n" +
+                    "************************************************";
             System.out.println("************************************************\n" +
                     "************************************************");
         }
+        return s;
     }
 
     public static void appendFacultyToArray(Faculty[] faculties, Faculty faculty) {
@@ -441,4 +661,5 @@ public class Driver_SchoolDB {
             }
         }
     }
+
 }

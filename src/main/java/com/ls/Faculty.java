@@ -79,6 +79,17 @@ public class Faculty extends Employee {
         return null;
     }
 
+    public boolean doesFacultyTeachSelectedCourse(Course course) {
+        if(coursesTaught == null) return false;
+        for(int i = 0; i < coursesTaught.length; i++) {
+            Course currentCourse = coursesTaught[i];
+            if(currentCourse == null) break;
+            System.out.println("what is courses taught" + coursesTaught[i]);
+            if(course.equals(currentCourse)) return true;
+        }
+        return false;
+    }
+
     public String getCourseTaughtAsString(int index) {
         Course course = getCourseTaught(index);
         return course.toString();
