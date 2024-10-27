@@ -25,10 +25,10 @@ public class Driver_SchoolDB {
         String content = "";
 
         //read file and store content in hashMap
-        printAndStoreFileContent(true, contentMap);
+        printAndStoreFileContent(true, contentMap, content);
 
         //print first part of stars
-        generateMenuOrFooter("menu");
+        content += generateMenuOrFooter("menu");
 
         //generate classes as specified in file
         generateClassesFromMap(contentMap, courses, generalStaffs, faculties, students);
@@ -36,12 +36,12 @@ public class Driver_SchoolDB {
         //functions to generate text from stored arrays
         content += generateCourseText(courses, true);
         content += generatePersonText(people);
-        conent += generateEmployeeText(employees);
-        generateGeneralStaffText(generalStaffs, true);
-        generateFacultyText(faculties, true);
-        generateStudentText(students, true);
+        content += generateEmployeeText(employees);
+        content += generateGeneralStaffText(generalStaffs, true);
+        content += generateFacultyText(faculties, true);
+        content += generateStudentText(students, true);
 
-        generateMenuOrFooter("footer");
+        content += generateMenuOrFooter("footer");
 
         //PART 2 ************************************************************************************************
 
@@ -152,14 +152,17 @@ public class Driver_SchoolDB {
         System.out.println("Student with the least credits: "+ studentWithMinCredits);
 
         //print all items using.toString()
-        generateCourseText(courses, false);
-        generateGeneralStaffText(generalStaffs, false);
-        generateFacultyText(faculties, false);
-        generateStudentText(students, false);
+        content += generateCourseText(courses, false);
+        content += generateGeneralStaffText(generalStaffs, false);
+        content += generateFacultyText(faculties, false);
+        content += generateStudentText(students, false);
+
+        //write to new file
+        writeToNewFile("/Users/laibasajid/Desktop/project1/src/main/java/com/ls/generatedText.txt",content);
 
     }
 
-    public void writeToNewFile(String fileName, String content){
+    public static void writeToNewFile(String fileName, String content){
         PrintWriter outStream = null;//DECLARE
         try {
             outStream = new PrintWriter(fileName);//INITIALIZE... CREATE...
@@ -338,7 +341,7 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
+    public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap, String content) {
         //get path str for local testing / Zybooks test
         String path = isLocal ? "/Users/laibasajid/Desktop/project1/src/main/java/com/ls/SchoolDB_Initial.txt" : "SchoolDB_Initial.txt";
         Scanner fileStream = null;
@@ -351,6 +354,8 @@ public class Driver_SchoolDB {
 
             while(fileStream.hasNextLine()) {
                 String lineInFile = fileStream.nextLine();
+                System.out.println("I AM TRYING TO ADD CONTENT");
+                content += lineInFile;
                 System.out.println(lineInFile);
                 contentMap.put(lineNumber++, lineInFile);
             }
@@ -364,16 +369,19 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateMenuOrFooter(String option) {
+    public static String generateMenuOrFooter(String option) {
         if(option.equals("menu")){
             System.out.println("**************************************************************");
             System.out.println("SCHOOL DATABASE INFO:");
             System.out.println();
             System.out.println("************************************************");
+            return "**************************************************************\nSCHOOL DATABASE INFO:\n************************************************";
         } else if(option.equals("footer")) {
             System.out.println("************************************************\n" +
                     "**************************************************************\n");
+            return "************************************************\n**************************************************************\n";
         }
+        return "ERROR: MUST ENTER OPTION";
     }
 
     public static void generateClassesFromMap(HashMap<Integer, String> contentMap, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
@@ -606,11 +614,22 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateFacultyText(Faculty[] faculties, boolean isPart1){
+    public static String generateFacultyText(Faculty[] faculties, boolean isPart1){
+        String s = "FACULTY:";
         System.out.println("FACULTY:");
         for(Faculty faculty : faculties) {
             if(faculty == null) break;
             if(isPart1) {
+                s += String.format(
+                        "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d Faculty: %11s | Number of Courses Taught: %3d | Courses Taught: %s",
+                        faculty.getName(),
+                        faculty.getBirthYear(),
+                        faculty.getDeptName(),
+                        faculty.getEmployeeID(),
+                        faculty.isTenured() ? "Is Tenured" : "Not Tenured",
+                        faculty.getNumCoursesTaught(),
+                        faculty.getAllCoursesTaughtAsString()
+                );
                 System.out.println(String.format(
                         "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d Faculty: %11s | Number of Courses Taught: %3d | Courses Taught: %s",
                         faculty.getName(),
@@ -626,9 +645,12 @@ public class Driver_SchoolDB {
             }
         }
         if(isPart1) {
+            s += "************************************************\n" +
+                    "************************************************";
             System.out.println("************************************************\n" +
                     "************************************************");
         }
+        return s;
     }
 
     public static void appendStudentToArray(Student[] students, Student student) {
@@ -641,11 +663,22 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateStudentText(Student[] students, boolean isPart1) {
+    public static String generateStudentText(Student[] students, boolean isPart1) {
+        String s = "STUDENTS:";
         System.out.println("STUDENTS:");
         for(Student student : students) {
             if(student == null) break;
             if(isPart1) {
+                s += String.format(
+                        "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %20s | %14s | Number of Courses Taken: %3d | Courses Taken: %s",
+                        student.getName(),
+                        student.getBirthYear(),
+                        "000" + student.getStudentID(),
+                        student.getMajor(),
+                        student.isGraduate() ? "Graduate" : "Undergraduate",
+                        student.getNumCoursesTaken(),
+                        student.getAllCoursesTakenAsString()
+                );
                 System.out.println(String.format(
                         "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %20s | %14s | Number of Courses Taken: %3d | Courses Taken: %s",
                         student.getName(),
@@ -660,6 +693,7 @@ public class Driver_SchoolDB {
                 System.out.println(student.toString() + "\n\n");
             }
         }
+        return s;
     }
 
 }
