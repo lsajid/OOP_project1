@@ -72,7 +72,7 @@ public class Student extends Person {
     public static boolean validateIndex(Course[] arr, int index) {
         if (index < 0) return false;
         if (index > arr.length) return false;
-        return true;
+        return arr[index] != null;
     }
 
     public void addCourseTaken(Course course) {

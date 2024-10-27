@@ -49,7 +49,6 @@ public class Faculty extends Employee {
     }
 
     public void addCourseTaught(Course course) {
-
         if(numCoursesTaught < 100) {
             coursesTaught[numCoursesTaught] = course;
             numCoursesTaught++;
@@ -64,7 +63,14 @@ public class Faculty extends Employee {
         }
     }
 
+    public static boolean validateIndex(Course[] arr, int index) {
+        if (index < 0) return false;
+        if (index > arr.length) return false;
+        return arr[index] != null;
+    }
+
     public Course getCourseTaught(int index) {
+        if(!validateIndex(coursesTaught,index)) return null;
         for (int i = 0; i < coursesTaught.length; i++) {
             if(i == index) {
                 return coursesTaught[i];

@@ -19,7 +19,7 @@ public class Driver_SchoolDB {
         Student[] students = new Student[15];
 
         //read file and store content in hashMap
-        printAndStoreFileContent(false, contentMap);
+        printAndStoreFileContent(true, contentMap);
 
         //print first part of stars
         generateMenuOrFooter("menu");
@@ -28,24 +28,121 @@ public class Driver_SchoolDB {
         generateClassesFromMap(contentMap, courses, generalStaffs, faculties, students);
 
         //functions to generate text from stored arrays
-        generateCourseText(courses);
+        generateCourseText(courses, true);
         generatePersonText(people);
         generateEmployeeText(employees);
-        generateGeneralStaffText(generalStaffs);
-        generateFacultyText(faculties);
-        generateStudentText(students);
+        generateGeneralStaffText(generalStaffs, true);
+        generateFacultyText(faculties, true);
+        generateStudentText(students, true);
 
         generateMenuOrFooter("footer");
 
         //PART 2 ************************************************************************************************
 
-        //init null scanner variable for userInput stream
-        Scanner scnr = new Scanner(System.in);
         //create new instance of userMenu
-        UserMenu userMenu = new UserMenu(scnr);
+        UserMenu userMenu = new UserMenu();
+        String[] userInputItems = new String[100];
 
-        userMenu.closeUserScanner(scnr);
+        //listen to userStream for inputs
+        userMenu.addUserInputsToArray(userInputItems);
 
+        //generate all items for class
+        generateAndPrintAllItemsFromUserInputArray(userInputItems, courses, generalStaffs, faculties, students);
+
+        //show All courses
+        generateCourseText(courses, false);
+        generateGeneralStaffText(generalStaffs, false);
+        generateFacultyText(faculties, false);
+        generateStudentText(students, false);
+
+        //close scanner instance
+        userMenu.closeUserScanner();
+
+        //Add 2 new Courses to a Faculty object
+        System.out.println("(2 pts) Add 2 new Courses to a Faculty object");
+        Faculty supermanFaculty = faculties[3];
+        supermanFaculty.addCourseTaught(new Course(false, 123, "CMP", 4));
+        supermanFaculty.addCourseTaught(new Course(true, 321, "MAT", 3));
+        System.out.println("Faculty object: " + supermanFaculty.toString()+ "\n\n");
+
+        //Add 2 new Courses to a Student object
+        System.out.println("(2 pts) Add 2 new Courses to a Student object");
+        Student wonderWomanStudent = students[3];
+        wonderWomanStudent.addCourseTaken(new Course(false, 123, "CMP", 4));
+        wonderWomanStudent.addCourseTaken(new Course(true, 321, "MAT", 3));
+        System.out.println("Student object: " + wonderWomanStudent.toString() + "\n\n");
+
+        //Add an array of 2 Courses to a Faculty object
+        System.out.println("(1 pts) Add an array of 2 Courses to a Faculty object");
+        appendFacultyToArray(faculties, new Faculty("Prof. Sofianos", 2024, "CMP", true));
+        Faculty professor = getFacultyByName("Prof. Sofianos", faculties);
+        Course[] coursesToAdd = new Course[] {new Course(true, 252, "CMP", 4), new Course(true, 168, "CMP", 4)};
+        professor.addCoursesTaught(coursesToAdd);
+        System.out.println("Faculty object: " + professor.toString()+ "\n\n");
+
+        //Add an array of 2 courses to a Student Object
+        System.out.println("(1 pts) Add an array of 2 Courses to a Student object");
+        appendStudentToArray(students, new Student("Laiba", 1998, "Computer Science", false));
+        Student laiba = getStudentByName("Laiba", students);
+        laiba.addCoursesTaken(coursesToAdd);
+        System.out.println("Student object: " + laiba.toString() + "\n\n");
+
+        //Get the Course at index (valid and invalid indexes) from a Faculty object
+        System.out.println("(1 pts) Get the Course at index (valid and invalid indexes) from a Faculty object");
+        Course validCourseFromProfessor = professor.getCourseTaught(0);
+        Course invalidCourseFromProfessor = professor.getCourseTaught(100000);
+        System.out.println("Valid Course: " + validCourseFromProfessor + "\nInvalid Index: " + invalidCourseFromProfessor + "\n\n");
+
+        //Get the Course at index (valid and invalid indexes) from a Student object
+        System.out.println("(1 pts) Get the Course at index (valid and invalid indexes) from a Student object");
+        Course validCourseFromLaiba = laiba.getCourseTaken(0);
+        Course invalidCourseFromLaiba = laiba.getCourseTaken(10000);
+        System.out.println("Valid Course: " + validCourseFromLaiba + "\nInvalid Index: " + invalidCourseFromLaiba + "\n\n");
+
+
+    }
+
+    public static Boolean doesFacultyTeachCourse() {
+
+        return false;
+    }
+
+    public static Faculty getFacultyByName(String name, Faculty[] faculties) {
+        for(Faculty faculty : faculties) {
+            if(faculty.getName().equals(name)) {
+                return faculty;
+            }
+        }
+        return null;
+    }
+
+    public static Student getStudentByName(String name, Student[] students) {
+        for(Student student : students) {
+            if(student.getName().equals(name)) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public static void generateAndPrintAllItemsFromUserInputArray(String[] userInputItems, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
+        System.out.println("_______\nAttempting to create stated items above please hold");
+        //iterate through array
+        parseClassesFromUserInputsAndCreateClass(userInputItems, courses, generalStaffs, faculties, students);
+        //
+        System.out.println("_______\nDone creating items above");
+    }
+
+    public static void parseClassesFromUserInputsAndCreateClass(String[] userInputItems, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
+        //iterate through contentMap to get class type
+        for (String line : userInputItems) {
+            if(line == null) break; //if current line is null do not generate class
+            String classType = getClassType(line);
+            String[] constructorParams = getConstructorParams(line);
+            if (classType != null && !classType.isEmpty()) {
+                createAndStoreClass(classType, constructorParams, courses, generalStaffs, faculties, students);
+            }
+        }
     }
 
     public static void printAndStoreFileContent(boolean isLocal, HashMap<Integer, String> contentMap) {
@@ -107,15 +204,19 @@ public class Driver_SchoolDB {
         return str.substring(str.indexOf(":")+1).trim().split(",");
     }
 
+    public static Course createCourseClass(String[] constructorParams) {
+        boolean isGraduateCourse = Boolean.parseBoolean(constructorParams[0]);
+        int courseNum = Integer.parseInt(constructorParams[1].trim());
+        String courseDept = constructorParams[2].trim();
+        int numCredits = Integer.parseInt(constructorParams[3].trim());
+
+        return new Course(isGraduateCourse, courseNum, courseDept, numCredits);
+    }
+
     public static void createAndStoreClass(String classType, String[] constructorParams, Course[] courses, GeneralStaff[] generalStaffs, Faculty[] faculties, Student[] students) {
         switch (classType) {
             case "Course":
-                boolean isGraduateCourse = Boolean.parseBoolean(constructorParams[0]);
-                int courseNum = Integer.parseInt(constructorParams[1].trim());
-                String courseDept = constructorParams[2].trim();
-                int numCredits = Integer.parseInt(constructorParams[3].trim());
-
-                Course courseToAdd = new Course(isGraduateCourse, courseNum, courseDept, numCredits);
+                Course courseToAdd = createCourseClass(constructorParams);
                 appendCourseToArray(courses, courseToAdd);
                 break;
             case "GeneralStaff":
@@ -195,9 +296,7 @@ public class Driver_SchoolDB {
                 }
                 appendStudentToArray(students ,studentToAdd);
                 break;
-            case "Employee":
-                break;
-            case "Person":
+            default:
                 break;
         }
     }
@@ -212,14 +311,16 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateCourseText(Course[] courses) {
+    public static void generateCourseText(Course[] courses, boolean isPart1) {
         System.out.println("COURSES:");
         for (Course course : courses) {
             if(course == null) break;
             System.out.println(course.toString());
         }
-        System.out.println("************************************************\n" +
-                "************************************************");
+        if(isPart1) {
+            System.out.println("************************************************\n" +
+                    "************************************************");
+        }
     }
 
     public static void generatePersonText(Person[] people) {
@@ -252,21 +353,27 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateGeneralStaffText(GeneralStaff[] generalStaffs) {
+    public static void generateGeneralStaffText(GeneralStaff[] generalStaffs, boolean isPart1) {
         System.out.println("GENERAL STAFF:");
         for (GeneralStaff generalStaff : generalStaffs) {
             if(generalStaff == null) break;
-            System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d GeneralStaff: Duty: %10s",
-                    generalStaff.getName(),
-                    generalStaff.getBirthYear(),
-                    generalStaff.getDeptName(),
-                    generalStaff.getEmployeeID(),
-                    generalStaff.getDuty()
-            ));
+            if(isPart1) {
+                System.out.println(String.format(
+                        "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d GeneralStaff: Duty: %10s",
+                        generalStaff.getName(),
+                        generalStaff.getBirthYear(),
+                        generalStaff.getDeptName(),
+                        generalStaff.getEmployeeID(),
+                        generalStaff.getDuty()
+                ));
+            } else {
+                System.out.println(generalStaff.toString() + "\n\n");
+            }
         }
-        System.out.println("************************************************\n" +
-                "************************************************");
+        if(isPart1) {
+            System.out.println("************************************************\n" +
+                    "************************************************");
+        }
     }
 
     public static void appendFacultyToArray(Faculty[] faculties, Faculty faculty) {
@@ -279,23 +386,29 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateFacultyText(Faculty[] faculties){
+    public static void generateFacultyText(Faculty[] faculties, boolean isPart1){
         System.out.println("FACULTY:");
         for(Faculty faculty : faculties) {
             if(faculty == null) break;
-            System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d Faculty: %11s | Number of Courses Taught: %3d | Courses Taught: %s",
-                    faculty.getName(),
-                    faculty.getBirthYear(),
-                    faculty.getDeptName(),
-                    faculty.getEmployeeID(),
-                    faculty.isTenured() ? "Is Tenured" : "Not Tenured",
-                    faculty.getNumCoursesTaught(),
-                    faculty.getAllCoursesTaughtAsString()
-            ));
+            if(isPart1) {
+                System.out.println(String.format(
+                        "Person: Name: %30s | Birth Year: %4d Employee: Department: %20s | Employee Number: %3d Faculty: %11s | Number of Courses Taught: %3d | Courses Taught: %s",
+                        faculty.getName(),
+                        faculty.getBirthYear(),
+                        faculty.getDeptName(),
+                        faculty.getEmployeeID(),
+                        faculty.isTenured() ? "Is Tenured" : "Not Tenured",
+                        faculty.getNumCoursesTaught(),
+                        faculty.getAllCoursesTaughtAsString()
+                ));
+            } else {
+                System.out.println(faculty.toString() + "\n\n");
+            }
         }
-        System.out.println("************************************************\n" +
-                "************************************************");
+        if(isPart1) {
+            System.out.println("************************************************\n" +
+                    "************************************************");
+        }
     }
 
     public static void appendStudentToArray(Student[] students, Student student) {
@@ -308,20 +421,24 @@ public class Driver_SchoolDB {
         }
     }
 
-    public static void generateStudentText(Student[] students) {
+    public static void generateStudentText(Student[] students, boolean isPart1) {
         System.out.println("STUDENTS:");
         for(Student student : students) {
             if(student == null) break;
-            System.out.println(String.format(
-                    "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %20s | %14s | Number of Courses Taken: %3d | Courses Taken: %s",
-                    student.getName(),
-                    student.getBirthYear(),
-                    "000" + student.getStudentID(),
-                    student.getMajor(),
-                    student.isGraduate() ? "Graduate" : "Undergraduate",
-                    student.getNumCoursesTaken(),
-                    student.getAllCoursesTakenAsString()
-            ));
+            if(isPart1) {
+                System.out.println(String.format(
+                        "Person: Name: %30s | Birth Year: %4d Student: studentID: %4s | Major %20s | %14s | Number of Courses Taken: %3d | Courses Taken: %s",
+                        student.getName(),
+                        student.getBirthYear(),
+                        "000" + student.getStudentID(),
+                        student.getMajor(),
+                        student.isGraduate() ? "Graduate" : "Undergraduate",
+                        student.getNumCoursesTaken(),
+                        student.getAllCoursesTakenAsString()
+                ));
+            } else {
+                System.out.println(student.toString() + "\n\n");
+            }
         }
     }
 }
